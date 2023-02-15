@@ -4,3 +4,17 @@
   padding: 2rem;
   text-align: center;
 }
+
+.boxesWrapper {
+  display: flex;
+  gap: 2rem;
+}
+
+.box {
+  height: 100px;
+  width: 100px;
+  border: 1px solid white;
+  border-radius: 5px;
+  display: grid;
+  place-items: center;
+}
