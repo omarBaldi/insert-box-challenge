@@ -29,15 +29,51 @@ function App() {
    * will be the start.
    */
   useEffect(() => {
-    const handleEventListenerClick = ({ y: yAxisValue }: MouseEvent): void => {
-      const firstBoxElement = boxesWrapperRef.current?.children[0];
-      if (typeof firstBoxElement === 'undefined') return;
+    const handleEventListenerClick = ({
+      y: yAxisValue,
+      x: xAxisValue,
+    }: MouseEvent): void => {
+      const parentElement: HTMLDivElement | null = boxesWrapperRef.current;
+      if (!parentElement || parentElement.children.length <= 0) return;
 
+      const [firstBoxElement] = parentElement.children;
       const { offsetTop, clientHeight } = firstBoxElement as HTMLDivElement;
       const boxYAxisRange = offsetTop + clientHeight;
 
       if (yAxisValue < offsetTop || yAxisValue > boxYAxisRange) return;
-      alert('Y axis correct');
+
+      /**
+       * In order to detect if the user has clicked in between 2 elements
+       * I need to check the offsetLeft of each one of the boxes, to know
+       * when to stop.
+       */
+
+      const boxes = [...parentElement.children];
+      let startIndex = 0;
+
+      while (boxes[startIndex]) {
+        const { offsetLeft: distanceFromLeft } = boxes[startIndex] as HTMLDivElement;
+
+        if (distanceFromLeft > xAxisValue) break;
+        startIndex += 1;
+      }
+
+      /**
+       * If the index is set to either 0 or to the boxes length,
+       * that means that the user has either clicked at the beginning
+       * or at the end, not in between 2 boxes, therefore stop here.
+       */
+      if (startIndex <= 0 || startIndex >= boxes.length) return;
+
+      setBoxes((prevBoxes) => {
+        const updatedBoxes = [
+          ...prevBoxes.slice(0, startIndex),
+          '-',
+          ...prevBoxes.slice(startIndex),
+        ];
+
+        return updatedBoxes;
+      });
     };
 
     document.addEventListener('click', handleEventListenerClick);
@@ -49,7 +85,11 @@ function App() {
 
   return (
     <div className='App'>
-      <div className='boxesWrapper' ref={boxesWrapperRef}>
+      <div
+        className='boxesWrapper'
+        ref={boxesWrapperRef}
+        style={{ border: '1px solid red' }}
+      >
         {boxes.map((boxLabel, index: number) => {
           return (
             <div key={`bx-${boxLabel}-#${index}`} className='box'>
