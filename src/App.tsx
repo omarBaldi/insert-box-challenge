@@ -27,7 +27,7 @@ function App() {
       startIndex += 1;
     }
 
-    return 0;
+    return startIndex;
   };
 
   useEffect(() => {
@@ -71,6 +71,8 @@ function App() {
       if (!parentElement || parentElement.children.length <= 0) return;
 
       /**
+       * * Handle case for box click
+       * *------------------------------------------------*
        * In order to detect if user has clicked inside one
        * of the boxes I need to compare the current target
        * with one of the boxes and if the same, I allow
@@ -88,22 +90,20 @@ function App() {
         return;
       }
 
+      /**
+       * * Handle case for click in between 2 elements
+       * *------------------------------------------------*
+       */
       const [firstBoxElement] = parentElement.children;
       const { offsetTop, clientHeight } = firstBoxElement as HTMLDivElement;
       const boxYAxisRange = offsetTop + clientHeight;
 
       if (yAxisValue < offsetTop || yAxisValue > boxYAxisRange) return;
 
-      /**
-       * In order to detect if the user has clicked in between 2 elements
-       * I need to check the offsetLeft of each one of the boxes, to know
-       * when to stop.
-       *
-       */
-
+      const boxes = [...parentElement.children];
       const indexBox = getIndexLastAvailableCell({
         xAxisValue,
-        boxes: [...parentElement.children],
+        boxes,
       });
 
       /**
@@ -113,10 +113,16 @@ function App() {
        */
       if (indexBox <= 0 || indexBox >= boxes.length) return;
 
+      const boxesAmountToCreate = prompt('How many boxes would you like to insert?', '0');
+      if (!boxesAmountToCreate || isNaN(+boxesAmountToCreate)) return;
+      if (+boxesAmountToCreate > 10) return;
+
       setBoxes((prevBoxes) => {
+        const newBoxes = [...Array(+boxesAmountToCreate)].fill('-');
+
         const updatedBoxes = [
           ...prevBoxes.slice(0, indexBox),
-          '-',
+          ...newBoxes,
           ...prevBoxes.slice(indexBox),
         ];
 
@@ -153,11 +159,7 @@ function App() {
 
   return (
     <div className='App'>
-      <div
-        className='boxesWrapper'
-        ref={boxesWrapperRef}
-        style={{ border: '1px solid red' }}
-      >
+      <div className='boxesWrapper' ref={boxesWrapperRef}>
         {boxes.map((boxLabel, index: number) => {
           return (
             <div key={`bx-${boxLabel}-#${index}`} className='box'>

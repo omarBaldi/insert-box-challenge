@@ -8,6 +8,7 @@
 .boxesWrapper {
   display: flex;
   gap: 2rem;
+  cursor: copy;
 }
 
 .box {
