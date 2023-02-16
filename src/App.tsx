@@ -6,6 +6,30 @@ function App() {
   const [boxes, setBoxes] = useState<string[]>([]);
   const [boxIndexClicked, setBoxIndexClicked] = useState<number>();
 
+  /**
+   * @description
+   * @param
+   * @returns
+   */
+  const getIndexLastAvailableCell = ({
+    xAxisValue,
+    boxes,
+  }: {
+    xAxisValue: number;
+    boxes: Element[];
+  }): number => {
+    let startIndex = 0;
+
+    while (boxes[startIndex]) {
+      const { offsetLeft: distanceFromLeft } = boxes[startIndex] as HTMLDivElement;
+
+      if (distanceFromLeft > xAxisValue) break;
+      startIndex += 1;
+    }
+
+    return 0;
+  };
+
   useEffect(() => {
     const length = 3;
     const initialBoxes = [...Array(length).keys()].map(
@@ -32,6 +56,9 @@ function App() {
    * TODO: transform this into custom hook that takes the
    * TODO: ...x and y axis values as well as the box ref..
    * TODO: ...and return the updated elements to render into the DOM
+   *
+   *
+   * ? possibly allow user to insert boxes also at beginning
    *
    */
   useEffect(() => {
@@ -72,31 +99,25 @@ function App() {
        * I need to check the offsetLeft of each one of the boxes, to know
        * when to stop.
        *
-       * TODO: transform this into function
        */
 
-      const boxes = [...parentElement.children];
-      let startIndex = 0;
-
-      while (boxes[startIndex]) {
-        const { offsetLeft: distanceFromLeft } = boxes[startIndex] as HTMLDivElement;
-
-        if (distanceFromLeft > xAxisValue) break;
-        startIndex += 1;
-      }
+      const indexBox = getIndexLastAvailableCell({
+        xAxisValue,
+        boxes: [...parentElement.children],
+      });
 
       /**
        * If the index is set to either 0 or to the boxes length,
        * that means that the user has either clicked at the beginning
        * or at the end, not in between 2 boxes, therefore stop here.
        */
-      if (startIndex <= 0 || startIndex >= boxes.length) return;
+      if (indexBox <= 0 || indexBox >= boxes.length) return;
 
       setBoxes((prevBoxes) => {
         const updatedBoxes = [
-          ...prevBoxes.slice(0, startIndex),
+          ...prevBoxes.slice(0, indexBox),
           '-',
-          ...prevBoxes.slice(startIndex),
+          ...prevBoxes.slice(indexBox),
         ];
 
         return updatedBoxes;
