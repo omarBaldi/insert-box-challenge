@@ -110,7 +110,9 @@ function App() {
     };
   }, []);
 
-  const handleBoxInputChange = (e: React.ChangeEvent): void => {
+  const handleBoxInputChange = (e: React.KeyboardEvent): void => {
+    if (e.code !== 'Enter') return;
+
     const { value: updatedBoxValue, dataset } = e.target as HTMLInputElement;
     const boxIndex: string | undefined = dataset['boxIndex'];
 
@@ -138,9 +140,9 @@ function App() {
                 <input
                   type='text'
                   autoFocus
-                  value={boxLabel}
+                  defaultValue={boxLabel}
                   data-box-index={index}
-                  onChange={handleBoxInputChange}
+                  onKeyUp={handleBoxInputChange}
                 />
               ) : (
                 boxLabel
