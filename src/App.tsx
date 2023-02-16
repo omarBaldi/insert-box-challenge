@@ -110,6 +110,8 @@ function App() {
     };
   }, []);
 
+  const resetIndexBoxClicked = (): void => setBoxIndexClicked(undefined);
+
   const handleBoxInputChange = (e: React.KeyboardEvent): void => {
     if (e.code !== 'Enter') return;
 
@@ -124,6 +126,8 @@ function App() {
 
       return updatedBoxes;
     });
+
+    resetIndexBoxClicked();
   };
 
   return (
@@ -143,6 +147,7 @@ function App() {
                   defaultValue={boxLabel}
                   data-box-index={index}
                   onKeyUp={handleBoxInputChange}
+                  onBlur={resetIndexBoxClicked}
                 />
               ) : (
                 boxLabel
